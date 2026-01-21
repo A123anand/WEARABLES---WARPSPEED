@@ -10,3 +10,8 @@
 # sklearn
 # scipy
 import pandas as pd
+# Git clone  
+# Ssh link: git@github.com:A123anand/WEARABLES---WARPSPEED.git 
+# pip install -r requirements.txt 
+# This has all the basic extensions u should need 
+# csv file reading info: https://docs.python.org/3/library/csv.html
