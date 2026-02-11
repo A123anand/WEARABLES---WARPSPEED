@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import time as t 
 
 # columns  list
 # timestamp,
@@ -48,6 +49,9 @@ def read_csv_file(file):
             imu_lower_pitch_deg.append(data["imu_lower_pitch_deg"].iloc[row])
             imu_lower_yaw_deg.append(data["imu_lower_yaw_deg"].iloc[row])
             print(time[row])
+        else:
+            print("data collection complete")
+            break
     #iloc [used for purely integer-location based indexing to select specific rows and columns from a DataFrame. I] 
     # so now we have collected the data in real time and stored it in its own lists
     # we can now start working with the data
@@ -61,6 +65,8 @@ if __name__ == "__main__":
     file_path = 'dummy_spine_imu_angles_day.csv'
     data = read_csv_file(file_path)
     print(data)
+    print ("done")
+
 
 #old code im keeping for reference:
 
