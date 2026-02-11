@@ -10,10 +10,18 @@
 # sklearn
 # scipy
 # import pandas as pd
-# Git clone  
+# Git clone  stuff
 # Ssh link: git@github.com:A123anand/WEARABLES---WARPSPEED.git 
 # to import all the stuff I listed up there run this in your terminl:
 # pip install -r requirements.txt 
     # This has all the basic extensions u should need 
 # csv file reading info: https://docs.python.org/3/library/csv.html
 # editing!!!!!
+
+# git pull and push
+# first make sure you are in the right directory in the terminal
+# to pull the latest changes from the remote repository, run:
+# git pull
+# to add your changes to the staging area, run: git add .
+# to commit your changes with a message, run: git commit -m "Your commit message here"
+# to push your changes to the remote repository, run: git push
