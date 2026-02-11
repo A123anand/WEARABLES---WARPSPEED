@@ -9,9 +9,11 @@
 # seaborn
 # sklearn
 # scipy
-import pandas as pd
+# import pandas as pd
 # Git clone  
 # Ssh link: git@github.com:A123anand/WEARABLES---WARPSPEED.git 
+# to import all the stuff I listed up there run this in your terminl:
 # pip install -r requirements.txt 
-# This has all the basic extensions u should need 
+    # This has all the basic extensions u should need 
 # csv file reading info: https://docs.python.org/3/library/csv.html
+# editing!!!!!
