@@ -57,14 +57,27 @@ def read_csv_file(file):
     # we can now start working with the data
 
     return time, imu_upper_roll_deg, imu_upper_pitch_deg, imu_upper_yaw_deg, imu_lower_roll_deg, imu_lower_pitch_deg, imu_lower_yaw_deg
+def upper_roll():
+    return imu_upper_roll_deg
+def upper_pitch():
+    return imu_upper_pitch_deg
+def upper_yaw():
+    return imu_upper_yaw_deg
+def lower_roll():
+    return imu_lower_roll_deg   
+def lower_pitch():
+    return imu_lower_pitch_deg
+def lower_yaw():
+    return imu_lower_yaw_deg
 
-    
+
 
 #main function:
 if __name__ == "__main__":
     file_path = 'dummy_spine_imu_angles_day.csv'
     data = read_csv_file(file_path)
     print(data)
+
     print ("done")
 
 
