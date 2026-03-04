@@ -1,5 +1,8 @@
 //Spine IMU: SDA→21, SCL→22, AD0→GND → address 0x68 → “back”.
 //Shoulder IMU: SDA→21, SCL→22, AD0→3.3 V → address 0x69 → “shoulder”.
+
+// Outputs to terminal in CSV format, first 3 values = spine IMU vector, second 3 values = shoulder IMU vector. 
+
 #include <Wire.h> 
 #include "BluetoothSerial.h"
 BluetoothSerial SerialBT;
