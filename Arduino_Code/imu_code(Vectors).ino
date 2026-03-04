@@ -1,3 +1,5 @@
+//Spine IMU: SDA→21, SCL→22, AD0→GND → address 0x68 → “back”.
+//Shoulder IMU: SDA→21, SCL→22, AD0→3.3 V → address 0x69 → “shoulder”.
 #include <Wire.h> 
 #include "BluetoothSerial.h"
 BluetoothSerial SerialBT;
@@ -192,7 +194,8 @@ void loop() {
     SerialBT.print(spineAcY);    SerialBT.print(",");
     SerialBT.print(spineAcZ);    SerialBT.print(",");
     SerialBT.print(shoulderAcX); SerialBT.print(",");
-    SerialBT.print(shoulderAcY); SerialBT.println(shoulderAcZ);
+    SerialBT.print(shoulderAcY); SerialBT.print(",");
+    SerialBT.println(shoulderAcZ);
 
     delay(400);
 }
