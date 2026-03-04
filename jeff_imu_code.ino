@@ -15,7 +15,6 @@ void setup() {
 Wire.begin(); 
 
 Serial.begin(9600); 
-SerialBT.begin("ESP32_IMU");  // Bluetooth device name
 
 // WAKE UP SENSOR 1 
 Wire.beginTransmission(MPU1_addr); 
