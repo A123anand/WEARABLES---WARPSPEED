@@ -78,6 +78,7 @@ void loop() {
 
     // Send raw accelerometer vectors for both IMUs in one CSV line:
     // To USB Serial (Can Remove once we confirm Bluetooth is working)
+    Serial.print(esp_timer_get_time()); Serial.print(",");
     Serial.print(spineAcX);   Serial.print(",");
     Serial.print(spineAcY);   Serial.print(",");
     Serial.print(spineAcZ);   Serial.print(",");
@@ -86,6 +87,7 @@ void loop() {
     Serial.println(shoulderAcZ);
 
     // To Bluetooth Serial (for laptop logging)
+    SerialBT.print(esp_timer_get_time()); SerialBT.print(",");
     SerialBT.print(spineAcX);    SerialBT.print(",");
     SerialBT.print(spineAcY);    SerialBT.print(",");
     SerialBT.print(spineAcZ);    SerialBT.print(",");
@@ -95,4 +97,3 @@ void loop() {
 
     delay(400);
 }
-
