@@ -25,3 +25,8 @@
 # to add your changes to the staging area, run: git add .
 # to commit your changes with a message, run: git commit -m "Your commit message here"
 # to push your changes to the remote repository, run: git push
+
+#to run stuff on the com port
+# $port = New-Object System.IO.Ports.SerialPort COM11, 115200, None, 8, one
+# $port.Open()
+# while($port.IsOpen) { Write-Host $port.ReadLine() }
