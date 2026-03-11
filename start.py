@@ -30,3 +30,6 @@
 # $port = New-Object System.IO.Ports.SerialPort COM11, 115200, None, 8, one
 # $port.Open()
 # while($port.IsOpen) { Write-Host $port.ReadLine() }
+
+# to check what com you are in 
+# python -c "import serial.tools.list_ports as p; print([port.device for port in p.comports()])"
