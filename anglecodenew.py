@@ -88,4 +88,4 @@ if __name__ == "__main__":
 
     # After loop ends, save converted CSV
     conversion(time_data, imu_1, imu_2)
-    print("Converted CSV saved: imu_converted_data.csv")ih
+    print("Converted CSV saved: imu_converted_data.csv")
