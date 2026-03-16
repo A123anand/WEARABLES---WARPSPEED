@@ -1,5 +1,5 @@
 # b is the bottom and a is the top
-
+# best one - use this script!!!
 import numpy as np
 import serial
 import time
@@ -88,4 +88,4 @@ if __name__ == "__main__":
 
     # After loop ends, save converted CSV
     conversion(time_data, imu_1, imu_2)
-    print("Converted CSV saved: imu_converted_data.csv")
+    print("Converted CSV saved: imu_converted_data.csv")ih
