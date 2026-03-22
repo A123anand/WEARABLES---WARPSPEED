@@ -7,6 +7,7 @@ import csv
 import pandas as pd
 
 ser = serial.Serial('COM7', 9600, timeout=1)
+
 time.sleep(2)
 def IMU(imu_1, imu_2):
     # number of comparable rows
@@ -94,8 +95,7 @@ if __name__ == "__main__":
         imu_1.append([ax, ay, az])
         imu_2.append([bx, by, bz])
         
-
-# inside loop:
+        # inside loop:
         df.loc[len(df)] = [t, ax, ay, az, bx, by, bz]
 
         # save to CSV with headers
