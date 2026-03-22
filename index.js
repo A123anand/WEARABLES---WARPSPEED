@@ -71,6 +71,7 @@ function load_data(a){
     displayData(data);
     return data;
 }
+
 function displayData(data) {
 
     const output = document.getElementById("output");

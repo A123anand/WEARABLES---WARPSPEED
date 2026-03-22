@@ -2,3 +2,14 @@ body {
   background-color: rgb(2, 60, 17);
   color: #fbf6c8;
 }
+a {
+    color: #fbf6c8;
+}
+
+a:hover {
+    color: #ffffff;
+}
+
+a:visited {
+    color: #c8e8c8;
+}

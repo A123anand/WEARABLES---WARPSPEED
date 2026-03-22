@@ -1,49 +1,133 @@
+<!-- login for the website: alanand1 password: 123-->
 <!DOCTYPE html>
 <html>
-
-
 <head>
     <title>Warpspeed</title>
-    <meta http-equiv="Content-Security-Policy">
-    <!-- <script src="index.js"></script>-->
-    <script src="index.js" defer></script> 
+    <meta charset="UTF-8">
+    <script src="index1.js" defer></script>
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <h1>Welcome to Warpspeed</h1>
-    <p>We are a team of CU Boulder engineering students that are working on a wearable designed to help improve posture.</p>
-    <p> Part of the Colorade Space Grant Consortium </p>
-    
-    <!-- <body style="background-color: rgb(2, 60, 17);color: #fbf6c8;">
-    <input type="file" id="csvInput" accept=".csv" /> this is how we can upload a CSV file -->
 
-    <!-- Tab buttons -->
-    <div class="auth-tabs">
-        <button class="tab-btn active" id="loginTab" onclick="switchTab('login')">Login</button>
-        <button class="tab-btn" id="signupTab" onclick="switchTab('signup')">Sign Up</button>
+    <!-- ========== AUTH SCREEN ========== -->
+    <div id="authScreen">
+        <h1>Welcome to Warpspeed</h1>
+        <p>We are a team of CU Boulder engineering students working on a wearable designed to help improve posture.</p>
+        <p>Part of the Colorado Space Grant Consortium</p>
+
+        <div class="auth-tabs">
+            <button class="tab-btn active" id="loginTab" onclick="switchTab('login')">Login</button>
+            <button class="tab-btn" id="signupTab" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="loginForm">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username" required><br>
+            <input type="password" id="password" placeholder="Password" required><br>
+            <button onclick="logIn()">Login</button>
+        </div>
+
+        <!-- Sign Up Form -->
+        <div id="signupForm" style="display:none;">
+            <h2>Sign Up</h2>
+            <input type="text" id="newUsername" placeholder="Username" required><br>
+            <input type="password" id="newPassword" placeholder="Password" required><br>
+            <button onclick="signUp()">Sign Up</button>
+        </div>
     </div>
 
-    <!-- Login Form -->
-    <div id="loginForm">
-        <h2>Login</h2>
-        <input type="text" id="username" placeholder="Username" required><br>
-        <input type="password" id="password" placeholder="Password" required><br>
-        <button onclick="logIn()">Login</button>
+    <!-- ========== HOME SCREEN ========== -->
+    <div id="homeScreen" style="display:none;">
 
+        <!-- Header -->
+        <div class="home-header">
+            <h1>Warpspeed</h1>
+            <div class="header-right">
+                <span id="welcomeMsg"></span>
+                <button class="logout-btn" onclick="logOut()">Logout</button>
+            </div>
+        </div>
 
-    </div>
+        <!-- Nav buttons -->
+        <div class="home-nav">
+            <button class="home-nav-btn active" id="navData" onclick="showPage('data')">📊 Data &amp; Charts</button>
+            <button class="home-nav-btn" id="navResources" onclick="showPage('resources')">📚 Posture Resources</button>
+        </div>
 
-    <!-- Sign Up Form (hidden by default) -->
-    <div id="signupForm" style="display:none;">
-        <h2>Sign Up</h2>
-        <input type="text" id="newUsername" placeholder="Username" required><br>
-        <input type="password" id="newPassword" placeholder="Password" required><br>
-        <button onclick="signUp()">Sign Up</button>
-    </div>
+        <!-- DATA PAGE -->
+        <div id="pageData">
+            <div class="page-intro">
+                <h2>Your Posture Data</h2>
+                <p>Data is pulled live from your Warpspeed device. You can also upload a CSV manually below.</p>
+                <label class="upload-label" for="csvInput">⬆ Upload CSV</label>
+                <input type="file" id="csvInput" accept=".csv" onchange="handleCSV(event)" />
+            </div>
+            <div id="output">
+                <div class="empty-state">
+                    <p>📡 No data yet. Connect your device or upload a CSV to get started.</p>
+                </div>
+            </div>
+        </div>
 
+        <!-- RESOURCES PAGE -->
+        <div id="pageResources" style="display:none;">
+            <div class="page-intro">
+                <h2>Posture Resources</h2>
+                <p>Tips, exercises, and guides to help you build better posture habits.</p>
+            </div>
 
-    <div id="output"></div>
+            <div class="resources-grid">
 
+                <div class="resource-card">
+                    <h3> Daily Stretches</h3>
+                    <p>A 10-minute morning routine targeting the neck, shoulders, and thoracic spine.</p>
+                    <ul>
+                        <li>Childs Pose</li>
+                        <li>Foward FOld</li>
+                        <li>Cat Cow</li>
+                        <li>Chest Opener</li>
+                        <li>These are a few exercises that can help improve posture.</li>
+                        <li> Read for more exercises and tips:
+                        <li><a href="https://studenthealth.sa.ucsb.edu/sites/default/files/2021-03/posture.pdf" target="_blank">Posture Correction and Stretching</a></li>
+                        </li> <li><a href="https://www.healthline.com/health/posture-exercises#childs-pose" target= "_blank"></a></li>
+                    </ul>
+                </div>
+
+                <div class="resource-card">
+                    <h3> Habits and Tips</h3>
+                    <p>Small habits compound into lasting change</p>
+                    <ul>
+                        <li>Ensure the top of your screen is at eye level.</li>
+                        <li>Rest your feet on a footrest or flat on the floor.</li>
+                        <li>Adjust the desk height to elbow level.</li>
+                        <li>Use a timer to alert you every 30 minutes to take a break, stand up, walk around, or grab some water.</li>
+                        <li>Do physical activity daily</li>
+                        <li>Review your Warpspeed data spinal data!!</li>
+                        <li> Read more at:</li> <li><a href="https://news.cuanschutz.edu/dbmi/improving-posture" target= "_blank">Improving Posture for Better Health with Emily Gibson, DO</a></li>
+                    </ul>
+                </div>
+
+                <div class="resource-card">
+                    <h3>📖 Further Reading</h3>
+                    <ul>
+                        <li><a href="https://medlineplus.gov/guidetogoodposture.html" target="_blank">Guide to Good Posture</a></li>
+                        <li><a href="https://www.mayoclinic.org/healthy-lifestyle/adult-health/in-depth/office-ergonomics/art-20046169" target="_blank">Mayo Clinic: Office Ergonomics</a></li>
+                        <li><a href="https://studenthealth.sa.ucsb.edu/sites/default/files/2021-03/posture.pdf" target="_blank">Posture Correction and Stretching</a></li>
+                        <li><a href=" https://stvincents.org/about-us/news-press/news-detail?articleId=67058" target="_blank">6 Bad Posture Habits That Are Hurting Your Spine</a></li>
+                        <li><a href="https://news.cuanschutz.edu/dbmi/improving-posture" target= "_blank">Improving Posture for Better Health with Emily Gibson, DO</a></li>
+                    </ul>
+                </div>
+
+                <div class="resource-card">
+                    <h3>🚀 About Warpspeed</h3>
+                    <p>Warpspeed is a wearable posture device.</p>
+                </div>
+
+            </div>
+        </div>
+
+    </div><!-- end homeScreen -->
 
 </body>
 </html>

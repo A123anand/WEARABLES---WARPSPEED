@@ -1,5 +1,5 @@
 # b is the bottom and a is the top
-
+# best one - use this script!!!
 import numpy as np
 import serial
 import time

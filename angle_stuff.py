@@ -1,5 +1,5 @@
 # b is the bottom and a is the top
-# most current !!!!
+# backup code - doesnt work very well
 import numpy as np
 import serial
 import time
