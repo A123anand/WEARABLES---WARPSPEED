@@ -45,11 +45,9 @@ function logIn() {
     setTimeout(() => {
         authScreen.style.display = "none";
         homeScreen.style.display = "block";
-        // Small delay so the display:block has rendered before opacity transition kicks in
         setTimeout(() => homeScreen.classList.add("visible"), 20);
     }, 400);
 
-    // Load data from server (your existing logic)
     load_data(true);
 }
 
