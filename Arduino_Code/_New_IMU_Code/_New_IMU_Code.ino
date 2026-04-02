@@ -6,6 +6,7 @@
 // Both IMUs share SDA, SCL, VCC, GND
 // IMU 1 (upper back): AD0 → GND → I2C address 0x68
 // IMU 2 (lower back): AD0 → 3.3V → I2C address 0x69
+// Baud Rate = 115200 for real-time monitoring
 // ================================================================
 
 #include <Wire.h>
@@ -292,5 +293,4 @@ else posture = "BAD - Severe bend";
 Serial.print("Angle:"); Serial.print(backAngle, 2);
 Serial.print(" Status:"); Serial.println(posture);
 
-delay(1000);
 }
