@@ -6,20 +6,20 @@ import time
 import csv
 import pandas as pd
 
-ser = serial.Serial('COM7', 9600, timeout=1)
+ser = serial.Serial('COM4', 9600, timeout=1)
 
 time.sleep(2)
 def IMU(imu_1, imu_2):
     # number of comparable rows
     imu_1_np = np.array(imu_1)
     imu_2_np = np.array(imu_2)
-    m = min(imu_1.shape[0], imu_2.shape[0])
+    m = min(imu_1_np.shape[0], imu_2_np.shape[0])
 
     angle_deg = np.zeros(m)
 
     for i in range(m):
-        a1 = imu_1[i, :] / np.linalg.norm(imu_1[i, :])
-        a2 = imu_2[i, :] / np.linalg.norm(imu_2[i, :])
+        a1 = imu_1_np[i, :] / np.linalg.norm(imu_1_np[i, :])
+        a2 = imu_2_np[i, :] / np.linalg.norm(imu_2_np[i, :])
 
         dot_product = np.dot(a1, a2)
 
@@ -49,6 +49,7 @@ def conversion(time_data, imu_1, imu_2):
         df.loc[len(df)] = [t, ax, ay, az, bx, by, bz, angle]
 
     df.to_csv("imu_converted_data.csv", index=False)
+
     print("Converted CSV saved: imu_converted_data.csv")
         
 

@@ -5,7 +5,7 @@ import serial
 import time
 import pandas as pd
 
-ser = serial.Serial('COM7', 9600, timeout=1)
+ser = serial.Serial('COM4', 9600, timeout=1)
 time.sleep(2)
 
 def IMU(imu_1, imu_2):
