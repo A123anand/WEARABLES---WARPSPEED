@@ -11,6 +11,9 @@
 
 #include <Wire.h>
 #include <math.h>
+#include <BluetoothSerial.h>
+
+BluetoothSerial SerialBT;
 
 // ── I2C Addresses ───────────────────────────────────────────────
 #define IMU1_ADDR 0x68
@@ -119,8 +122,7 @@ struct MadgwickFilter {
 
         // Normalise quaternion
         recipNorm = 1.0f / sqrtf(q0*q0 + q1*q1 + q2*q2 + q3*q3);
-        q0 *= recipNorm; q1 *= recipNorm;
-        q2 *= recipNorm; q3 *= recipNorm;
+        q0 *= recipNorm; q1 *= recipNorm; q2 *= recipNorm; q3 *= recipNorm;
     }
 
     float getPitch() {
