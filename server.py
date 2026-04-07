@@ -1,4 +1,5 @@
 # server.py
+# look at vercel 
 # Watches imu_converted_data.csv and streams new rows to the browser.
 #
 # Install:   pip install fastapi uvicorn websockets pandas
