@@ -1,0 +1,94 @@
+
+<!-- 
+<!DOCTYPE html>
+<html>
+
+
+<head>
+    <title>Warpspeed</title>
+    <meta http-equiv="Content-Security-Policy">
+    <!-- <script src="index.js"></script>-->
+    <script src="index1.js" defer></script> 
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <h1>Welcome to Warpspeed</h1>
+    <p>We are a team of CU Boulder engineering students that are working on a wearable designed to help improve posture.</p>
+    <p> Part of the Colorade Space Grant Consortium </p>
+    
+    <!-- Tab buttons -->
+    <div class="auth-tabs">
+        <button class="tab-btn active" id="loginTab" onclick="switchTab('login')">Login</button>
+        <button class="tab-btn" id="signupTab" onclick="switchTab('signup')">Sign Up</button>
+    </div>
+
+    <!-- Login Form -->
+    <div id="loginForm">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username" required><br>
+        <input type="password" id="password" placeholder="Password" required><br>
+        <button onclick="logIn()">Login</button>
+
+
+    </div>
+
+    <!-- Sign Up Form (hidden by default) -->
+    <div id="signupForm" style="display:none;">
+        <h2>Sign Up</h2>
+        <input type="text" id="newUsername" placeholder="Username" required><br>
+        <input type="password" id="newPassword" placeholder="Password" required><br>
+        <button onclick="signUp()">Sign Up</button>
+    </div>
+
+
+    <div id="output"></div>
+    <!-- ====== Home page ========= -->
+
+    <div id="homeScreen" style="display:none;">
+ 
+        <div class="home-header">
+            <h1>Warpspeed</h1>
+            <div class="header-right">
+                <span id="welcomeMsg"></span>
+                <button class="logout-btn" onclick="logOut()">Logout</button>
+            </div>
+        </div>
+ 
+        <!-- Two main nav buttons -->
+        <div class="home-nav">
+            <button class="home-nav-btn active" id="navData" 
+            onclick="showPage('data')">📊 Data &amp; Charts</button>
+            <button class="home-nav-btn" 
+            id="navResources" 
+            onclick="showPage('resources')">📚 Posture Resources</button>
+
+        </div>
+                <!-- RESOURCES PAGE -->
+        <div id="pageResources" style="display:none;">
+            <div class="page-intro">
+                <h2>Posture Resources</h2>
+                <p>Tips, exercises, and guides to help you build better posture habits.</p>
+        </div>
+        <div class="resources-grid">
+ 
+                <div class="resource-card">
+        <div class="resources-grid">
+            
+        <div class="resource-card">        
+            <div class="resource-card">
+                <!-- DATA PAGE -->
+        <div id="pageData">
+            <div class="page-intro">
+                <h2>Your Posture Data</h2>
+                <p>Data is pulled live from your Warpspeed device. You can also upload a CSV manually below.</p>
+                <label class="upload-label" for="csvInput">⬆ Upload CSV</label>
+                <input type="file" id="csvInput" accept=".csv" onchange="handleCSV(event)" />
+            </div>
+            <div id="output">
+                <div class="empty-state">
+                    <p>📡 No data yet. Connect your device or upload a CSV to get started.</p>
+        <h3>🚀 About Warpspeed</h3>
+            <p>Warpspeed is a wearable posture sensor built by CU Boulder engineering students as part of the Colorado Space Grant Consortium. The device tracks spinal alignment and delivers real-time feedback so you can correct posture before bad habits form.</p>
+        </div>
+</body>
+</html> -->

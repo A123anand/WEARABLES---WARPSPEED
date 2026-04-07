@@ -1,0 +1,7 @@
+<button id="connectBtn">Connect BLE</button>
+<script type="module">
+  import { connectPostureShirt } from './ble-demo.js';
+  document.getElementById('connectBtn').addEventListener('click', () => {
+    connectPostureShirt();
+  });
+</script>
