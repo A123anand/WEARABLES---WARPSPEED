@@ -6,6 +6,8 @@
     <meta charset="UTF-8">
     <script src="index1.js" defer></script>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
 </head>
 <body>
 
@@ -63,7 +65,9 @@
                 <label class="upload-label" for="csvInput">⬆ Upload CSV</label>
                 <input type="file" id="csvInput" accept=".csv" onchange="handleCSV(event)" />
             </div>
+
             <div id="output">
+                <canvas id="postureChart" style="display:none; max-width:100%; margin-top:20px;"></canvas>
                 <div class="empty-state">
                     <p>📡 No data yet. Connect your device or upload a CSV to get started.</p>
                 </div>

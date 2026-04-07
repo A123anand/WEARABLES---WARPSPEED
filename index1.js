@@ -155,7 +155,51 @@ function parseCSV(text) {
     }
     return data;
 }
+let chartInstance = null;
 
+function renderChart(data) {
+    const canvas = document.getElementById("postureChart");
+    canvas.style.display = "block";
+
+    // Extract labels and one data series (e.g. upper roll)
+    const labels = data.map(row => row["timestamp"] || "");
+    const upperRoll = data.map(row => parseFloat(row["imu_upper_roll_deg"]) || 0);
+    const lowerRoll = data.map(row => parseFloat(row["imu_lower_roll_deg"]) || 0);
+
+    // Destroy previous chart if it exists
+    if (chartInstance) chartInstance.destroy();
+
+    chartInstance = new Chart(canvas, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Upper Roll (deg)",
+                    data: upperRoll,
+                    borderColor: "#4f8ef7",
+                    tension: 0.3,
+                    fill: false
+                },
+                {
+                    label: "Lower Roll (deg)",
+                    data: lowerRoll,
+                    borderColor: "#f76f4f",
+                    tension: 0.3,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: "top" } },
+            scales: {
+                x: { title: { display: true, text: "Timestamp" } },
+                y: { title: { display: true, text: "Degrees" } }
+            }
+        }
+    });
+}
 // ===== DISPLAY TABLE =====
 
 function displayData(data) {
@@ -179,4 +223,5 @@ function displayData(data) {
 
     table += "</table>";
     output.innerHTML = table;
+    renderChart(data);
 }
