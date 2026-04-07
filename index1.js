@@ -156,38 +156,48 @@ function parseCSV(text) {
     return data;
 }
 let chartInstance = null;
+// function graphing_chart(data){
+//     const canvas = document.getElementById("Posture Graph")
+//     canvas.style.display = "block";
 
-function renderChart(data) {
+//     const labels = data.map(row => row["timestamp"]);
+//     const upperRoll = data.map(row => parseFloat(row["imu_upper_roll_deg"]) || 0);
+//     const lowerRoll = data.map(row => parseFloat(row["imu_lower_roll_deg"]) || 0);
+//     chartInstance = new Chart(canvas, {
+//         type: "line",
+//         data: {
+//             labels: labels,
+//             datasets: [
+//                 { label: "Upper Roll", data: upperRoll, borderColor: "#4f8ef7", tension: 0.3, fill: false },
+//                 { label: "Lower Roll", data: lowerRoll, borderColor: "#f76f4f", tension: 0.3, fill: false }
+//             ]
+//         },
+//         options: {
+//             responsive: true,
+//             scales: {
+//                 x: { title: { display: true, text: "Time" } },
+//                 y: { title: { display: true, text: "Degrees" } }
+//             }
+//         }
+//     });
+// }
+function tablechart(data) {
     const canvas = document.getElementById("postureChart");
     canvas.style.display = "block";
 
-    // Extract labels and one data series (e.g. upper roll)
     const labels = data.map(row => row["timestamp"] || "");
     const upperRoll = data.map(row => parseFloat(row["imu_upper_roll_deg"]) || 0);
     const lowerRoll = data.map(row => parseFloat(row["imu_lower_roll_deg"]) || 0);
 
-    // Destroy previous chart if it exists
-    if (chartInstance) chartInstance.destroy();
+    if (chartInstance) chartInstance.destroy(); // uncommented!
 
     chartInstance = new Chart(canvas, {
         type: "line",
         data: {
             labels: labels,
             datasets: [
-                {
-                    label: "Upper Roll (deg)",
-                    data: upperRoll,
-                    borderColor: "#4f8ef7",
-                    tension: 0.3,
-                    fill: false
-                },
-                {
-                    label: "Lower Roll (deg)",
-                    data: lowerRoll,
-                    borderColor: "#f76f4f",
-                    tension: 0.3,
-                    fill: false
-                }
+                { label: "Upper Roll (deg)", data: upperRoll, borderColor: "#4f8ef7", tension: 0.3, fill: false },
+                { label: "Lower Roll (deg)", data: lowerRoll, borderColor: "#f76f4f", tension: 0.3, fill: false }
             ]
         },
         options: {
@@ -223,5 +233,6 @@ function displayData(data) {
 
     table += "</table>";
     output.innerHTML = table;
-    renderChart(data);
+    tablechart(data);
+   // graphing_chart(data)
 }
