@@ -60,7 +60,7 @@ struct MadgwickFilter {
     q0 = 1.0f; q1 = 0.0f; q2 = 0.0f; q3 = 0.0f;
   }
 
-  void updateIMU(float gx, float gy, float gz, float ax, float ay, float az) {
+  void updateIMU(float gx, float gy, float gz, float ax, float ay, float az, float dt) {
     gx *= (PI / 180.0f);
     gy *= (PI / 180.0f);
     gz *= (PI / 180.0f);
@@ -104,7 +104,6 @@ struct MadgwickFilter {
       qDot4 -= beta * s3;
     }
 
-    float dt = 1.0f / sampleFreq;
     q0 += qDot1 * dt;
     q1 += qDot2 * dt;
     q2 += qDot3 * dt;
@@ -324,12 +323,9 @@ void setup() {
 
 void loop() {
   unsigned long now = micros();
-  if ((now - lastSampleTime) < SAMPLE_INTERVAL_US) return;
-  lastSampleTime = now;
-  //unsigned long now = micros();
-//   static unsigned long lastUpdateUs = micros();
-//   float dt = (now - lastUpdateUs) / 1e6f;
-//   lastUpdateUs = now;
+  static unsigned long lastUpdateUs = micros();
+  float dt = (now - lastUpdateUs) / 1e6f;
+  lastUpdateUs = now;
 
   float ax1, ay1, az1, gx1, gy1, gz1;
   float ax2, ay2, az2, gx2, gy2, gz2;
@@ -341,8 +337,8 @@ void loop() {
   ax2 -= cal2.ax; ay2 -= cal2.ay; az2 -= cal2.az;
   gx2 -= cal2.gx; gy2 -= cal2.gy; gz2 -= cal2.gz;
 
-  filter1.updateIMU(gx1, gy1, gz1, ax1, ay1, az1);
-  filter2.updateIMU(gx2, gy2, gz2, ax2, ay2, az2);
+  filter1.updateIMU(gx1, gy1, gz1, ax1, ay1, az1, dt);
+  filter2.updateIMU(gx2, gy2, gz2, ax2, ay2, az2, dt);
 
   sampleCount++;
 
