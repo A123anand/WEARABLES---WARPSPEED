@@ -7,7 +7,6 @@
     <script src="index1.js" defer></script>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-
 </head>
 <body>
 
@@ -54,7 +53,7 @@
         <!-- Nav buttons -->
         <div class="home-nav">
             <button class="home-nav-btn active" id="navData" onclick="showPage('data')">Data &amp; Charts</button>
-            <button class="home-nav-btn" id="navResources" onclick="showPage('resources')"> Posture Resources</button>
+            <button class="home-nav-btn" id="navResources" onclick="showPage('resources')">Posture Resources</button>
         </div>
 
         <!-- DATA PAGE -->
@@ -66,9 +65,10 @@
                 <input type="file" id="csvInput" accept=".csv" onchange="handleCSV(event)" />
             </div>
 
-            <div id="output">
-                <canvas id="postureChart" style="display:none; max-width:70%; margin-top:20px;"></canvas>
+            <!-- Canvas is outside #output so it doesn't get wiped when table renders -->
+            <canvas id="postureChart" style="display:none; max-width:70%; margin-top:20px;"></canvas>
 
+            <div id="output">
                 <div class="empty-state">
                     <p>📡 No data yet. Connect your device or upload a CSV to get started.</p>
                 </div>
@@ -85,31 +85,30 @@
             <div class="resources-grid">
 
                 <div class="resource-card">
-                    <h3> Daily stretch suggestions and resources to find more to improve posture </h3>
-                    <!-- <p>A 10-minute morning routine targeting the neck, shoulders, and thoracic spine.</p> -->
+                    <h3>Daily Stretch Suggestions</h3>
                     <ul>
-                        <li>Childs Pose</li>
-                        <li>Foward FOld</li>
+                        <li>Child's Pose</li>
+                        <li>Forward Fold</li>
                         <li>Cat Cow</li>
                         <li>Chest Opener</li>
                         <li>These are a few exercises that can help improve posture.</li>
-                        <li> Read for more exercises and tips:
+                        <li>Read for more exercises and tips:</li>
                         <li><a href="https://studenthealth.sa.ucsb.edu/sites/default/files/2021-03/posture.pdf" target="_blank">Posture Correction and Stretching</a></li>
-                        </li> <li><a href="https://www.healthline.com/health/posture-exercises#childs-pose" target= "_blank"></a></li>
+                        <li><a href="https://www.healthline.com/health/posture-exercises#childs-pose" target="_blank">Healthline: Posture Exercises</a></li>
                     </ul>
                 </div>
 
                 <div class="resource-card">
-                    <h3> Habits and Tips</h3>
+                    <h3>Habits and Tips</h3>
                     <p>Small habits compound into lasting change</p>
                     <ul>
                         <li>Ensure the top of your screen is at eye level.</li>
                         <li>Rest your feet on a footrest or flat on the floor.</li>
                         <li>Adjust the desk height to elbow level.</li>
                         <li>Use a timer to alert you every 30 minutes to take a break, stand up, walk around, or grab some water.</li>
-                        <li>Do physical activity daily</li>
-                        <li>Review your Warpspeed data spinal data!!</li>
-                        <li> Read more at:</li> <li><a href="https://news.cuanschutz.edu/dbmi/improving-posture" target= "_blank">Improving Posture for Better Health with Emily Gibson, DO</a></li>
+                        <li>Do physical activity daily.</li>
+                        <li>Review your Warpspeed spinal data!</li>
+                        <li>Read more at: <a href="https://news.cuanschutz.edu/dbmi/improving-posture" target="_blank">Improving Posture for Better Health with Emily Gibson, DO</a></li>
                     </ul>
                 </div>
 
@@ -119,8 +118,8 @@
                         <li><a href="https://medlineplus.gov/guidetogoodposture.html" target="_blank">Guide to Good Posture</a></li>
                         <li><a href="https://www.mayoclinic.org/healthy-lifestyle/adult-health/in-depth/office-ergonomics/art-20046169" target="_blank">Mayo Clinic: Office Ergonomics</a></li>
                         <li><a href="https://studenthealth.sa.ucsb.edu/sites/default/files/2021-03/posture.pdf" target="_blank">Posture Correction and Stretching</a></li>
-                        <li><a href=" https://stvincents.org/about-us/news-press/news-detail?articleId=67058" target="_blank">6 Bad Posture Habits That Are Hurting Your Spine</a></li>
-                        <li><a href="https://news.cuanschutz.edu/dbmi/improving-posture" target= "_blank">Improving Posture for Better Health with Emily Gibson, DO</a></li>
+                        <li><a href="https://stvincents.org/about-us/news-press/news-detail?articleId=67058" target="_blank">6 Bad Posture Habits That Are Hurting Your Spine</a></li>
+                        <li><a href="https://news.cuanschutz.edu/dbmi/improving-posture" target="_blank">Improving Posture for Better Health with Emily Gibson, DO</a></li>
                     </ul>
                 </div>
 
