@@ -326,6 +326,10 @@ void loop() {
   unsigned long now = micros();
   if ((now - lastSampleTime) < SAMPLE_INTERVAL_US) return;
   lastSampleTime = now;
+  //unsigned long now = micros();
+//   static unsigned long lastUpdateUs = micros();
+//   float dt = (now - lastUpdateUs) / 1e6f;
+//   lastUpdateUs = now;
 
   float ax1, ay1, az1, gx1, gy1, gz1;
   float ax2, ay2, az2, gx2, gy2, gz2;
