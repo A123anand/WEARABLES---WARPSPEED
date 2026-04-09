@@ -252,8 +252,7 @@
                     <div class="device-controls" style="margin: 16px 0 10px;">
                         <button id="connectBtn" onclick="connectBLE()">Connect device</button>
                         <button id="disconnectBtn" class="secondary" onclick="disconnectBLE()" disabled>Disconnect</button>
-                        <label class="upload-label" for="csvInput">Upload CSV</label>
-                        <input type="file" id="csvInput" accept=".csv" onchange="handleCSV(event)">
+                        <button id="recalibrateBtn" class="secondary" onclick="calibrateDevice()">Calibrate device</button>
                     </div>
                     <div class="ble-log" id="bleLog">Ready to connect. Open this page in Chrome, Edge, or Android Chrome, then click Connect device.</div>
                 </div>
@@ -331,6 +330,7 @@
         const NORDIC_UART_SERVICE = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
         const NORDIC_UART_RX = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
         const NORDIC_UART_TX = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+        const RX_UUID = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
 
         let bleDevice = null;
         let bleServer = null;
@@ -338,6 +338,16 @@
         let rxCharacteristic = null;
         let chart = null;
         let liveRows = [];
+
+
+        async function initBle(service) {
+            rxCharacteristic = await service.getCharacteristic(RX_UUID);
+        }
+
+        async function calibrateDevice() {
+            const encoder = new TextEncoder();
+            await rxCharacteristic.writeValueWithResponse(encoder.encode('CALIBRATE'));
+        }
 
         function signUp() {
             const username = document.getElementById('newUsername');
