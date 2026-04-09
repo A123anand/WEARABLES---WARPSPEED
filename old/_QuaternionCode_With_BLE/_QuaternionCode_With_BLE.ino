@@ -73,13 +73,13 @@ struct MadgwickFilter {
     float _8q1, _8q2;
     float q0q0, q1q1, q2q2, q3q3;
 
-    qDot1 = 0.5f * (-q1*gx - q2*gy - q3*gz);
-    qDot2 = 0.5f * ( q0*gx + q2*gz - q3*gy);
-    qDot3 = 0.5f * ( q0*gy - q1*gz + q3*gx);
-    qDot4 = 0.5f * ( q0*gz + q1*gy - q2*gx);
+    qDot1 = 0.5f * (-q1 * gx - q2 * gy - q3 * gz);
+    qDot2 = 0.5f * ( q0 * gx + q2 * gz - q3 * gy);
+    qDot3 = 0.5f * ( q0 * gy - q1 * gz + q3 * gx);
+    qDot4 = 0.5f * ( q0 * gz + q1 * gy - q2 * gx);
 
     if (!((ax == 0.0f) && (ay == 0.0f) && (az == 0.0f))) {
-      recipNorm = 1.0f / sqrtf(ax*ax + ay*ay + az*az);
+      recipNorm = 1.0f / sqrtf(ax * ax + ay * ay + az * az);
       ax *= recipNorm;
       ay *= recipNorm;
       az *= recipNorm;
@@ -88,14 +88,14 @@ struct MadgwickFilter {
       _2q2 = 2.0f * q2; _2q3 = 2.0f * q3;
       _4q0 = 4.0f * q0; _4q1 = 4.0f * q1; _4q2 = 4.0f * q2;
       _8q1 = 8.0f * q1; _8q2 = 8.0f * q2;
-      q0q0 = q0*q0; q1q1 = q1*q1; q2q2 = q2*q2; q3q3 = q3*q3;
+      q0q0 = q0 * q0; q1q1 = q1 * q1; q2q2 = q2 * q2; q3q3 = q3 * q3;
 
-      s0 = _4q0*q2q2 + _2q2*ax + _4q0*q1q1 - _2q1*ay;
-      s1 = _4q1*q3q3 - _2q3*ax + 4.0f*q0q0*q1 - _2q0*ay - _4q1 + _8q1*q1q1 + _8q1*q2q2 + _4q1*az;
-      s2 = 4.0f*q0q0*q2 + _2q0*ax + _4q2*q3q3 - _2q3*ay - _4q2 + _8q2*q1q1 + _8q2*q2q2 + _4q2*az;
-      s3 = 4.0f*q1q1*q3 - _2q1*ax + 4.0f*q2q2*q3 - _2q2*ay;
+      s0 = _4q0 * q2q2 + _2q2 * ax + _4q0 * q1q1 - _2q1 * ay;
+      s1 = _4q1 * q3q3 - _2q3 * ax + 4.0f * q0q0 * q1 - _2q0 * ay - _4q1 + _8q1 * q1q1 + _8q1 * q2q2 + _4q1 * az;
+      s2 = 4.0f * q0q0 * q2 + _2q0 * ax + _4q2 * q3q3 - _2q3 * ay - _4q2 + _8q2 * q1q1 + _8q2 * q2q2 + _4q2 * az;
+      s3 = 4.0f * q1q1 * q3 - _2q1 * ax + 4.0f * q2q2 * q3 - _2q2 * ay;
 
-      recipNorm = 1.0f / sqrtf(s0*s0 + s1*s1 + s2*s2 + s3*s3);
+      recipNorm = 1.0f / sqrtf(s0 * s0 + s1 * s1 + s2 * s2 + s3 * s3);
       s0 *= recipNorm; s1 *= recipNorm; s2 *= recipNorm; s3 *= recipNorm;
 
       qDot1 -= beta * s0;
@@ -109,7 +109,7 @@ struct MadgwickFilter {
     q2 += qDot3 * dt;
     q3 += qDot4 * dt;
 
-    recipNorm = 1.0f / sqrtf(q0*q0 + q1*q1 + q2*q2 + q3*q3);
+    recipNorm = 1.0f / sqrtf(q0 * q0 + q1 * q1 + q2 * q2 + q3 * q3);
     q0 *= recipNorm; q1 *= recipNorm; q2 *= recipNorm; q3 *= recipNorm;
   }
 };
@@ -201,7 +201,7 @@ void readRawIMU(uint8_t addr,
 
 void calibrateIMU(uint8_t addr, CalibData &cal) {
   const int N = 500;
-  double ax=0, ay=0, az=0, gx=0, gy=0, gz=0;
+  double ax = 0, ay = 0, az = 0, gx = 0, gy = 0, gz = 0;
   float tax, tay, taz, tgx, tgy, tgz;
 
   for (int i = 0; i < N; i++) {
@@ -224,9 +224,22 @@ void calibrateIMU(uint8_t addr, CalibData &cal) {
 // ================================================================
 
 float angleBetweenOrientations(MadgwickFilter &f1, MadgwickFilter &f2) {
-    float dot = f1.q0*f2.q0 + f1.q1*f2.q1 + f1.q2*f2.q2 + f1.q3*f2.q3;
-    dot = constrain(dot, -1.0f, 1.0f);
-    return 2.0f * acosf(fabsf(dot)) * (180.0f / PI);
+  float w1 = f1.q0, x1 = f1.q1, y1 = f1.q2, z1 = f1.q3;
+  float w2 = f2.q0, x2 = f2.q1, y2 = f2.q2, z2 = f2.q3;
+
+  float w =  w2 * w1 + x2 * (-x1) + y2 * (-y1) + z2 * (-z1);
+  float x =  w2 * (-x1) + x2 * w1 + y2 * (-z1) - z2 * (-y1);
+  float y =  w2 * (-y1) - x2 * (-z1) + y2 * w1 + z2 * (-x1);
+  float z =  w2 * (-z1) + x2 * (-y1) - y2 * (-x1) + z2 * w1;
+
+  float norm = sqrtf(w * w + x * x + y * y + z * z);
+  if (norm > 0.0f) {
+    w /= norm; x /= norm; y /= norm; z /= norm;
+  }
+
+  w = fabsf(w);
+  w = constrain(w, -1.0f, 1.0f);
+  return 2.0f * acosf(w) * (180.0f / PI);
 }
 
 // ================================================================
@@ -274,8 +287,8 @@ void setup() {
   initMPU(IMU1_ADDR);
   initMPU(IMU2_ADDR);
 
-  filter1.begin(SAMPLE_RATE_HZ, 0.033f);
-  filter2.begin(SAMPLE_RATE_HZ, 0.033f);
+  filter1.begin(SAMPLE_RATE_HZ, 0.05f);
+  filter2.begin(SAMPLE_RATE_HZ, 0.05f);
 
   Serial.println("Stand still and straight for 2 seconds...");
   delay(2000);
@@ -290,9 +303,12 @@ void setup() {
 
 void loop() {
   unsigned long now = micros();
-  static unsigned long lastUpdateUs = micros();
-  float dt = (now - lastUpdateUs) / 1e6f;
+  static unsigned long lastUpdateUs = now;
+  float dt = (now - lastUpdateUs) * 1e-6f;
   lastUpdateUs = now;
+
+  // Clamp dt to reject bad timing spikes
+  dt = constrain(dt, 0.004f, 0.020f);
 
   float ax1, ay1, az1, gx1, gy1, gz1;
   float ax2, ay2, az2, gx2, gy2, gz2;
@@ -326,24 +342,25 @@ void loop() {
   else if (backAngle < 35) posture = "POOR";
   else posture = "BAD";
 
-  // Serial debug output once per second
-    if (millis() - lastBLETime >= 1000) {
-        lastBLETime = millis();
+  if (millis() - lastBLETime >= 1000) {
+    lastBLETime = millis();
 
-        unsigned long t_ms = millis();
+    unsigned long t_ms = millis();
 
-        String payload = String("{\"t_ms\":") + String(t_ms) + ",\"angle\":" + String(backAngle, 2) + ",\"status\":\"" + posture + "\"}";
+    String payload = String("{\"t_ms\":") + String(t_ms) +
+                     ",\"angle\":" + String(backAngle, 2) +
+                     ",\"status\":\"" + posture + "\"}";
 
-        Serial.println(payload);
+    Serial.println(payload);
 
-        if (deviceConnected) {
-            pTxCharacteristic->setValue(payload.c_str());
-            pTxCharacteristic->notify();
-        }
+    if (deviceConnected) {
+      pTxCharacteristic->setValue(payload.c_str());
+      pTxCharacteristic->notify();
     }
+  }
 
   if (!deviceConnected && oldDeviceConnected) {
-    delay(200);
+    delay(1000);
     pServer->startAdvertising();
     Serial.println("BLE advertising restarted");
     oldDeviceConnected = deviceConnected;
