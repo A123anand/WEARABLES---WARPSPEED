@@ -3,6 +3,10 @@
 <html>
 <head>
     <title>Warpspeed</title>
+    <div class="pill" id="bleStatusPill">
+        <span class="pill-dot"></span>
+        <span id="bleStatusText">Disconnected</span>
+    </div>
     <meta charset="UTF-8">
     <script src="index1.js" defer></script>
     <link rel="stylesheet" type="text/css" href="style.css">
@@ -61,12 +65,13 @@
             <div class="page-intro">
                 <h2>Your Posture Data</h2>
                 <p>Data is pulled live from your Warpspeed device. You can also upload a CSV manually below.</p>
-                <label class="upload-label" for="csvInput">⬆ Upload CSV</label>
-                <input type="file" id="csvInput" accept=".csv" onchange="handleCSV(event)" />
+              <!--  <label class="upload-label" for="csvInput">⬆ Upload CSV</label>
+                <input type="file" id="csvInput" accept=".csv" onchange="handleCSV(event)" /> -->
             </div>
 
             <!-- Canvas is outside #output so it doesn't get wiped when table renders -->
             <canvas id="postureChart" style="display:none; max-width:70%; margin-top:20px;"></canvas>
+            <canvas id="postureChart2" style="display:none; max-width:70%; margin-top:20px;"></canvas>
 
             <div id="output">
                 <div class="empty-state">
@@ -87,7 +92,7 @@
                     </div>
                     <div class="ble-log" id="bleLog">Ready to connect. Open this page in Chrome, Edge, or Android Chrome, then click Connect device.</div>
                 </div>
-
+                
                 <div class="data-card">
                     <h3>Live metrics</h3>
                     <div class="status-grid">

@@ -2,26 +2,120 @@ const hardcodedCSV =
     'timestamp,imu_upper_roll_deg,imu_upper_pitch_deg,imu_upper_yaw_deg,imu_lower_roll_deg,imu_lower_pitch_deg,imu_lower_yaw_deg';
 
 // ===== AUTH =====
+// const NORDIC_UART_SERVICE = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+//         const NORDIC_UART_RX = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+//         const NORDIC_UART_TX = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+
+//         let bleDevice = null;
+//         let bleServer = null;
+//         let txCharacteristic = null;
+//         let rxCharacteristic = null;
+//         let chart = null;
+//         let liveRows = [];
+//     async function initBle(service) {
+//             rxCharacteristic = await service.getCharacteristic(RX_UUID);
+//         }
+
+//     async function calibrateDevice() {
+//         const encoder = new TextEncoder();
+//         await rxCharacteristic.writeValueWithResponse(encoder.encode('CALIBRATE'));
+//     }
 const NORDIC_UART_SERVICE = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
-        const NORDIC_UART_RX = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
-        const NORDIC_UART_TX = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+const NORDIC_UART_RX = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+const NORDIC_UART_TX = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
 
-        let bleDevice = null;
-        let bleServer = null;
-        let txCharacteristic = null;
-        let rxCharacteristic = null;
-        let chart = null;
-        let liveRows = [];
-    async function initBle(service) {
-            rxCharacteristic = await service.getCharacteristic(RX_UUID);
-        }
+let bleDevice = null;
+let bleServer = null;
+let txCharacteristic = null;
+let rxCharacteristic = null;
 
-    async function calibrateDevice() {
-        const encoder = new TextEncoder();
-        await rxCharacteristic.writeValueWithResponse(encoder.encode('CALIBRATE'));
+async function connectBLE() {
+    if (!navigator.bluetooth) {
+        setBLEState('Web Bluetooth unsupported', false, true);
+        appendLog('This browser does not support Web Bluetooth. Use Chrome, Edge, or Android Chrome.');
+        return;
     }
+    try {
+        appendLog('Requesting BLE device...');
+        bleDevice = await navigator.bluetooth.requestDevice({
+            filters: [{ namePrefix: 'PostureShirt' }],
+            optionalServices: [NORDIC_UART_SERVICE]
+        });
+        bleDevice.addEventListener('gattserverdisconnected', onDisconnected);
+        appendLog('Connecting to ' + (bleDevice.name || 'device') + '...');
+        bleServer = await bleDevice.gatt.connect();
+        const service = await bleServer.getPrimaryService(NORDIC_UART_SERVICE);
+        txCharacteristic = await service.getCharacteristic(NORDIC_UART_TX);
+        rxCharacteristic = await service.getCharacteristic(NORDIC_UART_RX);
+        await txCharacteristic.startNotifications();
+        txCharacteristic.addEventListener('characteristicvaluechanged', handleBLEPacket);
+        setBLEState('Connected', true, false);
+        appendLog('Connected and notifications started.');
+    } catch (error) {
+        setBLEState('Connection failed', false, true);
+        appendLog('BLE error: ' + error.message);
+    }
+}
 
+function disconnectBLE() {
+    if (txCharacteristic) {
+        try { txCharacteristic.removeEventListener('characteristicvaluechanged', handleBLEPacket); } catch (e) {}
+    }
+    if (bleDevice && bleDevice.gatt && bleDevice.gatt.connected) {
+        bleDevice.gatt.disconnect();
+    }
+    onDisconnected();
+}
+function setBLEState(status, connected = false, isError = false) {
+    const pill = document.getElementById('bleStatusPill');
+    const text = document.getElementById('bleStatusText');
+    text.textContent = status;
+    pill.classList.toggle('connected', connected);
+    pill.classList.toggle('error', isError);
+    document.getElementById('connectBtn').disabled = connected;
+    document.getElementById('disconnectBtn').disabled = !connected;
+}
 
+function appendLog(message) {
+    const log = document.getElementById('bleLog');
+    const timestamp = new Date().toLocaleTimeString();
+    log.textContent += `\n[${timestamp}] ${message}`;
+    log.scrollTop = log.scrollHeight;
+}
+function onDisconnected() {
+    txCharacteristic = null;
+    rxCharacteristic = null;
+    bleServer = null;
+    setBLEState('Disconnected');
+    appendLog('Device disconnected.');
+}
+
+async function calibrateDevice() {
+    const encoder = new TextEncoder();
+    await rxCharacteristic.writeValueWithResponse(encoder.encode('CALIBRATE'));
+}
+
+function handleBLEPacket(event) {
+    const decoder = new TextDecoder('utf-8');
+    const raw = decoder.decode(event.target.value);
+    appendLog('RX: ' + raw.trim());
+    const lines = raw.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+    for (const line of lines) {
+        try {
+            const packet = JSON.parse(line);
+            displayData([{
+                timestamp:           packet.t_ms,
+                imu_upper_pitch_deg: packet.angle,
+                imu_upper_roll_deg:  0,
+                imu_lower_roll_deg:  0,
+                imu_lower_pitch_deg: 0,
+                status:              packet.status
+            }]);
+        } catch (e) {
+            appendLog('Ignored non-JSON payload.');
+        }
+    }
+}
 function logIn() {
     const username = document.getElementById("username");
     const password = document.getElementById("password");
@@ -123,6 +217,7 @@ function load_data(a) {
                     }
                     data.push(obj);
                 }
+                print("data displayed")
                 displayData(data);
             });
     }
@@ -149,6 +244,7 @@ function parseCSV(text) {
     const data = [];
     for (let i = 1; i < rows.length; i++) {
         if (!rows[i].trim()) continue;
+        
         const obj = {};
         const curr_row = rows[i].split(',');
         for (let j = 0; j < headers.length; j++) {
@@ -159,31 +255,104 @@ function parseCSV(text) {
     return data;
 }
 let chartInstance = null;
-function graphing_chart(data){
-    const canvas = document.getElementById("Posture Graph")
+let chartInstance1 = null;
+// function graphing_chart(data){
+//     canvas.classList.remove('hidden');
+//     const labels = rows.map(row => Math.round(Number(row.timestamp) / 1000));
+//     const values = rows.map(row => row.angle_deg);
+//     if (!chart) {
+//         chart = new Chart(canvas.getContext('2d'), {
+//             type: 'line',
+//             data: {
+//                 labels,
+//                 datasets: [{
+//                     label: 'Posture angle (deg)',
+//                     data: values,
+//                     borderColor: '#7cc7ff',
+//                     backgroundColor: 'rgba(124, 199, 255, 0.18)',
+//                     borderWidth: 2,
+//                     fill: true,
+//                     tension: 0.2,
+//                     pointRadius: 0
+//                 }]
+//             },
+//             options: {
+//                 responsive: true,
+//                 maintainAspectRatio: true,
+//                 plugins: { legend: { labels: { color: '#e6edf3' } } },
+//                 scales: {
+//                     x: { ticks: { color: '#9da7b3' }, grid: { color: 'rgba(255,255,255,0.08)' } },
+//                     y: { ticks: { color: '#9da7b3' }, grid: { color: 'rgba(255,255,255,0.08)' } }
+//                 }
+//             }
+//         });
+//     } else {
+//         chart.data.labels = labels;
+//         chart.data.datasets[0].data = values;
+//         chart.update('none');
+//     }
+// }
+// function tablechart2(data) {
+//     const canvas = document.getElementById("postureChart2");
+//     canvas.style.display = "block";
+
+//     const labels = data.map(row => row["timestamp"] || "");
+//     const angleDeg = data.map(row => parseFloat(row["imu_upper_pitch_deg"]) || 0);
+
+//     if (chartInstance1) chartInstance1.destroy();
+
+//     chartInstance1 = new Chart(canvas, {
+//         type: "line",
+//         data: {
+//             labels: labels,
+//             datasets: [
+//                 { label: "Posture Angle (°)", data: angleDeg, borderColor: "#7cc7ff", backgroundColor: "rgba(124,199,255,0.18)", tension: 0.2, fill: true, pointRadius: 0, borderWidth: 2 }
+//             ]
+//         },
+//         options: {
+//             responsive: true,
+//             plugins: { legend: { position: "top" } },
+//             scales: {
+//                 x: { title: { display: true, text: "Timestamp" } },
+//                 y: { title: { display: true, text: "Degrees" } }
+//             }
+//         }
+//     });
+// }
+function tablechart2(data) {
+    const canvas = document.getElementById("postureChart2");
     canvas.style.display = "block";
 
-    const labels = data.map(row => row["timestamp"]);
-    const upperRoll = data.map(row => parseFloat(row["imu_upper_roll_deg"]) || 0);
-    const lowerRoll = data.map(row => parseFloat(row["imu_lower_roll_deg"]) || 0);
-    chartInstance = new Chart(canvas, {
+    const labels = data.map(row => row["timestamp"] || "");
+    const upperRoll  = data.map(row => parseFloat(row["imu_upper_roll_deg"])  || 0);
+    const lowerRoll  = data.map(row => parseFloat(row["imu_lower_roll_deg"])  || 0);
+    const upperPitch = data.map(row => parseFloat(row["imu_upper_pitch_deg"]) || 0);
+    const lowerPitch = data.map(row => parseFloat(row["imu_lower_pitch_deg"]) || 0);
+
+    if (chartInstance1) chartInstance1.destroy();
+
+    chartInstance1 = new Chart(canvas, {
         type: "line",
         data: {
             labels: labels,
             datasets: [
-                { label: "Upper Roll", data: upperRoll, borderColor: "#4f8ef7", tension: 0.3, fill: false },
-                { label: "Lower Roll", data: lowerRoll, borderColor: "#f76f4f", tension: 0.3, fill: false }
+                { label: "Upper Roll (°)",  data: upperRoll,  borderColor: "#3fb950", backgroundColor: "rgba(63,185,80,0.1)",  tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 },
+                { label: "Lower Roll (°)",  data: lowerRoll,  borderColor: "#fbf6c8", backgroundColor: "rgba(251,246,200,0.1)", tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 },
+                { label: "Upper Pitch (°)", data: upperPitch, borderColor: "#7cc7ff", backgroundColor: "rgba(124,199,255,0.1)", tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 },
+                { label: "Lower Pitch (°)", data: lowerPitch, borderColor: "#f0a830", backgroundColor: "rgba(240,168,48,0.1)",  tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 }
             ]
         },
         options: {
             responsive: true,
+            plugins: { legend: { position: "top" } },
             scales: {
-                x: { title: { display: true, text: "Time" } },
+                x: { title: { display: true, text: "Timestamp" } },
                 y: { title: { display: true, text: "Degrees" } }
             }
         }
     });
 }
+
 function tablechart(data) {
     const canvas = document.getElementById("postureChart");
     canvas.style.display = "block";
@@ -237,5 +406,12 @@ function displayData(data) {
     table += "</table>";
     output.innerHTML = table;
     tablechart(data);
+    tablechart2(data);
    // graphing_chart(data)
+}
+function destroyChart() {
+    if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+    if (chartInstance2) { chartInstance2.destroy(); chartInstance2 = null; }
+    document.getElementById('postureChart').style.display = 'none';
+    document.getElementById('postureChart2').style.display = 'none';
 }
