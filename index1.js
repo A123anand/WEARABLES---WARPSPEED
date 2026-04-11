@@ -2,22 +2,25 @@ const hardcodedCSV =
     'timestamp,imu_upper_roll_deg,imu_upper_pitch_deg,imu_upper_yaw_deg,imu_lower_roll_deg,imu_lower_pitch_deg,imu_lower_yaw_deg';
 
 // ===== AUTH =====
+const NORDIC_UART_SERVICE = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+        const NORDIC_UART_RX = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+        const NORDIC_UART_TX = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
 
-function signUp() {
-    const username = document.getElementById("newUsername");
-    const password = document.getElementById("newPassword");
-    if (username.value === "" || password.value === "") {
-        alert("Please fill in both fields.");
-        return;
+        let bleDevice = null;
+        let bleServer = null;
+        let txCharacteristic = null;
+        let rxCharacteristic = null;
+        let chart = null;
+        let liveRows = [];
+    async function initBle(service) {
+            rxCharacteristic = await service.getCharacteristic(RX_UUID);
+        }
+
+    async function calibrateDevice() {
+        const encoder = new TextEncoder();
+        await rxCharacteristic.writeValueWithResponse(encoder.encode('CALIBRATE'));
     }
-    if (localStorage.getItem(username.value)) {
-        alert("Username already exists. Please choose a different username.");
-        return;
-    }
-    localStorage.setItem(username.value, password.value);
-    alert("Username \"" + username.value + "\" registered successfully!");
-    switchTab('login');
-}
+
 
 function logIn() {
     const username = document.getElementById("username");
@@ -156,31 +159,31 @@ function parseCSV(text) {
     return data;
 }
 let chartInstance = null;
-// function graphing_chart(data){
-//     const canvas = document.getElementById("Posture Graph")
-//     canvas.style.display = "block";
+function graphing_chart(data){
+    const canvas = document.getElementById("Posture Graph")
+    canvas.style.display = "block";
 
-//     const labels = data.map(row => row["timestamp"]);
-//     const upperRoll = data.map(row => parseFloat(row["imu_upper_roll_deg"]) || 0);
-//     const lowerRoll = data.map(row => parseFloat(row["imu_lower_roll_deg"]) || 0);
-//     chartInstance = new Chart(canvas, {
-//         type: "line",
-//         data: {
-//             labels: labels,
-//             datasets: [
-//                 { label: "Upper Roll", data: upperRoll, borderColor: "#4f8ef7", tension: 0.3, fill: false },
-//                 { label: "Lower Roll", data: lowerRoll, borderColor: "#f76f4f", tension: 0.3, fill: false }
-//             ]
-//         },
-//         options: {
-//             responsive: true,
-//             scales: {
-//                 x: { title: { display: true, text: "Time" } },
-//                 y: { title: { display: true, text: "Degrees" } }
-//             }
-//         }
-//     });
-// }
+    const labels = data.map(row => row["timestamp"]);
+    const upperRoll = data.map(row => parseFloat(row["imu_upper_roll_deg"]) || 0);
+    const lowerRoll = data.map(row => parseFloat(row["imu_lower_roll_deg"]) || 0);
+    chartInstance = new Chart(canvas, {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [
+                { label: "Upper Roll", data: upperRoll, borderColor: "#4f8ef7", tension: 0.3, fill: false },
+                { label: "Lower Roll", data: lowerRoll, borderColor: "#f76f4f", tension: 0.3, fill: false }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: "Time" } },
+                y: { title: { display: true, text: "Degrees" } }
+            }
+        }
+    });
+}
 function tablechart(data) {
     const canvas = document.getElementById("postureChart");
     canvas.style.display = "block";

@@ -74,6 +74,38 @@
                 </div>
             </div>
         </div>
+        <div class="connect-row">
+                <div class="data-card">
+                    <h3>Device connection</h3>
+                    <p class="tiny-label">Uses the Nordic UART BLE service from your ESP32 firmware.</p>
+                    <div class="device-controls" style="margin: 16px 0 10px;">
+                        <button id="connectBtn" onclick="connectBLE()">Connect device</button>
+                        <button id="disconnectBtn" class="secondary" onclick="disconnectBLE()" disabled>Disconnect</button>
+                        <button id="recalibrateBtn" class="secondary" onclick="calibrateDevice()">Calibrate device</button>
+                        <label class="upload-label" for="csvInput">Upload CSV</label>
+                        <input type="file" id="csvInput" accept=".csv" onchange="handleCSV(event)">
+                    </div>
+                    <div class="ble-log" id="bleLog">Ready to connect. Open this page in Chrome, Edge, or Android Chrome, then click Connect device.</div>
+                </div>
+
+                <div class="data-card">
+                    <h3>Live metrics</h3>
+                    <div class="status-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Current angle</div>
+                            <div class="stat-value" id="currentAngle">--°</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Posture status</div>
+                            <div class="stat-value" id="currentStatus">--</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Samples received</div>
+                            <div class="stat-value" id="sampleCount">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         <!-- RESOURCES PAGE -->
         <div id="pageResources" style="display:none;">
