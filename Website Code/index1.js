@@ -419,6 +419,19 @@ function saveGraph() {
     link.href = canvas.toDataURL("image/png");
     link.click();
 }
+function saveCSV() {
+    if (liveRows.length === 0) {
+        appendLog('No data to export.');
+        return;
+    }
+    const headers = Object.keys(liveRows[0]);
+    const rows = liveRows.map(row => headers.map(h => row[h] ?? '').join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+    const link = document.createElement("a");
+    link.download = "posture_data.csv";
+    link.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+    link.click();
+}
 // ===== DISPLAY DATA=====
 
 function displayData(data) {
