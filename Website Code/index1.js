@@ -344,7 +344,8 @@ function tablechart2(data) {
     const canvas = document.getElementById("postureChart2");
     canvas.style.display = "block";
 
-    const labels     = data.map(row => row["timestamp (seconds)"] || "");
+   // const labels     = data.map(row => row["timestamp (seconds)"] || "");
+    const labels     = data.map(row => row["timestamp"] ? (Number(row["timestamp"]) / 1000).toFixed(1) : "");
     const upperRoll  = data.map(row => parseFloat(row["imu_upper_roll_deg"])  || 0);
     const lowerRoll  = data.map(row => parseFloat(row["imu_lower_roll_deg"])  || 0);
     const upperPitch = data.map(row => parseFloat(row["degrees"]) || 0);
@@ -412,7 +413,7 @@ function refreshTable(data) {
     const headers = Object.keys(data[0]);
     let table = "<table><tr>";
     //headers.forEach(h => table += `<th>${h}</th>`);
-    const headerLabels = { imu_upper_pitch_deg: "degrees", timestamp: "timestamp (Seconds)", status: "status" };
+    const headerLabels = { imu_upper_pitch_deg: "degrees", timestamp: "timestamp (ms)", status: "status" };
     headers.forEach(h => table += `<th>${headerLabels[h] || h}</th>`);
     table += "</tr>";
     data.forEach(row => {
