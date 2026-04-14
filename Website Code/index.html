@@ -2,8 +2,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Warpspeed</title>
-    <div class="pill" id="bleStatusPill">
+    <title>Your Orthopedic Dynamic Alignment (Warpspeed - Wearables)
+    </title>
+    <div class="pill" id="bleStatusPill"> <!--Pill classification refers to identification systems-->
         <span class="pill-dot"></span>
         <span id="bleStatusText">Disconnected</span>
     </div>
@@ -16,7 +17,7 @@
 
     <!-- ========== AUTH SCREEN ========== -->
     <div id="authScreen">
-        <h1>Welcome to Warpspeed</h1>
+        <h1>Welcome to Your Orthopedic Dynamic Alignment </h1>
         <p>We are a team of CU Boulder engineering students working on a wearable designed to help improve posture.</p>
         <p>Part of the Colorado Space Grant Consortium</p>
 
@@ -64,7 +65,7 @@
         <div id="pageData">
             <div class="page-intro">
                 <h2>Your Posture Data</h2>
-                <p>Data is pulled live from your Warpspeed device. You can also upload a CSV manually below.</p>
+                <p>Data is pulled live from your YODA device. You can also upload a CSV manually below.</p>
               <!--  <label class="upload-label" for="csvInput">⬆ Upload CSV</label>
                 <input type="file" id="csvInput" accept=".csv" onchange="handleCSV(event)" /> -->
             </div>
@@ -87,10 +88,11 @@
                         <button id="connectBtn" onclick="connectBLE()">Connect device</button>
                         <button id="disconnectBtn" class="secondary" onclick="disconnectBLE()" disabled>Disconnect</button>
                         <button id="recalibrateBtn" class="secondary" onclick="calibrateDevice()">Calibrate device</button>
+                        <button onclick="saveGraph()">Save Graph</button>
                         <label class="upload-label" for="csvInput">Upload CSV</label>
                         <input type="file" id="csvInput" accept=".csv" onchange="handleCSV(event)">
                     </div>
-                    <div class="ble-log" id="bleLog">Ready to connect. Click Connect device.</div>
+                    <div class="ble-log" id="bleLog">Ready to connect. Click Connect device. Log (ignore):</div>
                 </div>
                 
                 <div class="data-card">
@@ -162,7 +164,10 @@
 
                 <div class="resource-card">
                     <h3>🚀 About Warpspeed</h3>
-                    <p>YODA is a wearable posture device.</p>
+                    <p>YODA (Your Orthopedic Dynamic Alignment ) is a wearable posture device.
+                        Poor posture develops gradually, and these adjustments to the spine often go unnoticed; This leads to long-term discomfort in sedentary individuals such as students. Many existing posture monitoring systems rely on single sensors, which are unable to fully distinguish between healthy bending motions and harmful postural behaviors (e.g., slouching). This research, conducted by the Wearables Team, presents the design and validation of a wearable posture monitoring system integrated into a compression shirt for daily use. The system uses two inertial measurement units placed along the spine at the upper thoracic and lower lumbar regions. By calculating the relative angle between spinal segments, the system aims to distinguish healthy bending from poor posture more accurately than other single-sensor approaches.  
+                        Designed for and by students.
+                    </p>
                 </div>
 
             </div>

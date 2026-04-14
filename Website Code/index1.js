@@ -1,6 +1,6 @@
 const hardcodedCSV =
     'timestamp,imu_upper_roll_deg,imu_upper_pitch_deg,imu_upper_yaw_deg,imu_lower_roll_deg,imu_lower_pitch_deg,imu_lower_yaw_deg';
-
+let sessionStartTime = null;
 // ===== BLE =====
 const NORDIC_UART_SERVICE = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
 const NORDIC_UART_RX = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
@@ -14,6 +14,7 @@ let rxCharacteristic = null;
 // ===== LIVE DATA ACCUMULATOR =====
 // All rows received over BLE are stored here
 let liveRows = [];
+sessionStartTime = null;
 
 async function connectBLE() {
     if (!navigator.bluetooth) {
@@ -99,15 +100,15 @@ async function calibrateDevice() {
 
 // ===== BLE PACKET HANDLER =====
 // Your firmware sends one JSON packet per second:
-//   {"t_ms": 1234, "angle": 12.34, "status": "MILD - Slight bend"}
-// We map this onto the CSV schema so the same chart functions work for both
+// We map this onto the CSV schema so the same chart functions work
 // BLE live data and uploaded CSVs.
 
 function handleBLEPacket(event) {
     const decoder = new TextDecoder('utf-8');
     const raw = decoder.decode(event.target.value);
     appendLog('RX: ' + raw.trim());
-
+    // const row = {
+    //     timestamp:           packet.t_ms,
     const lines = raw.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
     for (const line of lines) {
         let packet;
@@ -119,23 +120,23 @@ function handleBLEPacket(event) {
         }
 
         // Build a row that matches the CSV schema.
-        // The firmware only sends a single "angle" (pitch difference between
-        // the two IMUs), so we populate imu_upper_pitch_deg with it and
-        // leave roll/lower columns as 0 until richer firmware data arrives.
-        const row = {
-            timestamp:           packet.t_ms,
-            imu_upper_roll_deg:  0,
+        // The firmware only sends a single "angle"
+        if (sessionStartTime === null) sessionStartTime = packet.t_ms;
+            const row = {
+            timestamp:           packet.t_ms - sessionStartTime,
+           // imu_upper_roll_deg:  0,
             imu_upper_pitch_deg: packet.angle,
-            imu_upper_yaw_deg:   0,
-            imu_lower_roll_deg:  0,
-            imu_lower_pitch_deg: 0,
-            imu_lower_yaw_deg:   0,
+           // imu_upper_yaw_deg:   0,
+            // imu_lower_roll_deg:  0,
+            // imu_lower_pitch_deg: 0,
+            // imu_lower_yaw_deg:   0,
+          //  degrees: packet.angle,
             status:              packet.status
         };
 
         liveRows.push(row);
 
-        // Update the live metrics panel
+        //   live metrics UPDATE
         updateLiveMetrics(packet);
 
         // Append one point to charts (fast path – no full table re-render)
@@ -236,28 +237,28 @@ function showPage(page) {
 
 // ===== DATA LOADING =====
 
-function load_data(a) {
-    if (a === true) {
-        fetch('http://127.0.0.1:5000/data')
-            .then(response => response.json())
-            .then(data => displayData(data))
-            .catch(error => {
-                console.error('Could not connect to server:', error);
-                const rows = hardcodedCSV.split('\n');
-                const headers = rows[0].split(',');
-                const data = [];
-                for (let i = 1; i < rows.length; i++) {
-                    const obj = {};
-                    const curr_row = rows[i].split(',');
-                    for (let j = 0; j < headers.length; j++) {
-                        obj[headers[j]] = curr_row[j];
-                    }
-                    data.push(obj);
-                }
-                displayData(data);
-            });
-    }
-}
+// function load_data(a) {
+//     if (a === true) {
+//         fetch('http://127.0.0.1:5000/data')
+//             .then(response => response.json())
+//             .then(data => displayData(data))
+//             .catch(error => {
+//                 console.error('Could not connect to server:', error);
+//                 const rows = hardcodedCSV.split('\n');
+//                 const headers = rows[0].split(',');
+//                 const data = [];
+//                 for (let i = 1; i < rows.length; i++) {
+//                     const obj = {};
+//                     const curr_row = rows[i].split(',');
+//                     for (let j = 0; j < headers.length; j++) {
+//                         obj[headers[j]] = curr_row[j];
+//                     }
+//                     data.push(obj);
+//                 }
+//                 displayData(data);
+//             });
+//     }
+// } // old flask code
 
 // ===== CSV FILE UPLOAD =====
 
@@ -295,47 +296,47 @@ function parseCSV(text) {
 let chartInstance  = null;   // postureChart  (upper/lower roll)
 let chartInstance1 = null;   // postureChart2 (all 4 channels)
 
-// ===== FULL CHART BUILD (used for CSV uploads / initial load) =====
+// =====  CHART BUILD (used for CSV uploads / initial load) =====
 
-function tablechart(data) {
-    const canvas = document.getElementById("postureChart");
-    canvas.style.display = "block";
+// function tablechart(data) {
+//     const canvas = document.getElementById("postureChart");
+//     canvas.style.display = "block";
 
-    const labels    = data.map(row => row["timestamp"] || "");
-    const upperRoll = data.map(row => parseFloat(row["imu_upper_roll_deg"]) || 0);
-    const lowerRoll = data.map(row => parseFloat(row["imu_lower_roll_deg"]) || 0);
+//     const labels    = data.map(row => row["timestamp"] || "");
+//     const upperRoll = data.map(row => parseFloat(row["imu_upper_roll_deg"]) || 0);
+//     const lowerRoll = data.map(row => parseFloat(row["imu_lower_roll_deg"]) || 0);
 
-    if (chartInstance) chartInstance.destroy();
+//     if (chartInstance) chartInstance.destroy();
 
-    chartInstance = new Chart(canvas, {
-        type: "line",
-        data: {
-            labels,
-            datasets: [
-                { label: "Upper Roll (°)", data: upperRoll, borderColor: "#4f8ef7", tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 },
-                { label: "Lower Roll (°)", data: lowerRoll, borderColor: "#f76f4f", tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 }
-            ]
-        },
-        options: {
-            responsive: true,
-            animation: false,
-            plugins: { legend: { position: "top" } },
-            scales: {
-                x: { title: { display: true, text: "Timestamp" } },
-                y: { title: { display: true, text: "Degrees" } }
-            }
-        }
-    });
-}
+//     chartInstance = new Chart(canvas, {
+//         type: "line",
+//         data: {
+//             labels,
+//             datasets: [
+//                 { label: "Upper Roll (°)", data: upperRoll, borderColor: "#4f8ef7", tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 },
+//                 { label: "Lower Roll (°)", data: lowerRoll, borderColor: "#f76f4f", tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 }
+//             ]
+//         },
+//         options: {
+//             responsive: true,
+//             animation: false,
+//             plugins: { legend: { position: "top" } },
+//             scales: {
+//                 x: { title: { display: true, text: "Timestamp" } },
+//                 y: { title: { display: true, text: "Degrees" } }
+//             }
+//         }
+//     });
+// }
 
 function tablechart2(data) {
     const canvas = document.getElementById("postureChart2");
     canvas.style.display = "block";
 
-    const labels     = data.map(row => row["timestamp"] || "");
+    const labels     = data.map(row => row["timestamp (seconds)"] || "");
     const upperRoll  = data.map(row => parseFloat(row["imu_upper_roll_deg"])  || 0);
     const lowerRoll  = data.map(row => parseFloat(row["imu_lower_roll_deg"])  || 0);
-    const upperPitch = data.map(row => parseFloat(row["imu_upper_pitch_deg"]) || 0);
+    const upperPitch = data.map(row => parseFloat(row["degrees"]) || 0);
     const lowerPitch = data.map(row => parseFloat(row["imu_lower_pitch_deg"]) || 0);
 
     if (chartInstance1) chartInstance1.destroy();
@@ -345,19 +346,24 @@ function tablechart2(data) {
         data: {
             labels,
             datasets: [
-                { label: "Upper Roll (°)",  data: upperRoll,  borderColor: "#3fb950", backgroundColor: "rgba(63,185,80,0.1)",  tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 },
-                { label: "Lower Roll (°)",  data: lowerRoll,  borderColor: "#fbf6c8", backgroundColor: "rgba(251,246,200,0.1)", tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 },
-                { label: "Upper Pitch (°)", data: upperPitch, borderColor: "#7cc7ff", backgroundColor: "rgba(124,199,255,0.1)", tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 },
-                { label: "Lower Pitch (°)", data: lowerPitch, borderColor: "#f0a830", backgroundColor: "rgba(240,168,48,0.1)",  tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 }
+             //   { label: "Upper Roll (°)",  data: upperRoll,  borderColor: "#3fb950", backgroundColor: "rgba(63,185,80,0.1)",  tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 },
+           //     { label: "Lower Roll (°)",  data: lowerRoll,  borderColor: "#fbf6c8", backgroundColor: "rgba(251,246,200,0.1)", tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 },
+                { label: "Degrees (°)", data: upperPitch, borderColor: "#7cc7ff", backgroundColor: "rgba(124,199,255,0.1)", tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 },
+               // { label: "Lower Pitch (°)", data: lowerPitch, borderColor: "#f0a830", backgroundColor: "rgba(240,168,48,0.1)",  tension: 0.3, fill: false, pointRadius: 0, borderWidth: 2 }
             ]
         },
         options: {
             responsive: true,
             animation: false,
-            plugins: { legend: { position: "top" } },
+            // plugins: { legend: { position: "top" } },
+            // scales: {
+            //     x: { title: { display: true, text: "Timestamp" } },
+            //     y: { title: { display: true, text: "Degrees" } }
+            // }
+            plugins: { legend: { position: "top", labels: { color: "#ffffff" } } },
             scales: {
-                x: { title: { display: true, text: "Timestamp" } },
-                y: { title: { display: true, text: "Degrees" } }
+                x: { title: { display: true, text: "Timestamp (Seconds)", color: "#ffffff" }, ticks: { color: "#ffffff" }, grid: { color: "rgba(255,255,255,0.1)" } },
+                y: { title: { display: true, text: "Degrees (°)", color: "#ffffff" }, ticks: { color: "#ffffff" }, grid: { color: "rgba(255,255,255,0.1)" } }
             }
         }
     });
@@ -369,38 +375,38 @@ function tablechart2(data) {
 // the existing Chart.js datasets and call update('none') to skip animation.
 
 function appendToCharts(row) {
-    const label      = row["timestamp"] || "";
-    const upperRoll  = parseFloat(row["imu_upper_roll_deg"])  || 0;
-    const lowerRoll  = parseFloat(row["imu_lower_roll_deg"])  || 0;
+    const label      = row["timestamp"] ? (Number(row["timestamp"]) / 1000).toFixed(4) : "";
+    //const upperRoll  = parseFloat(row["Degrees"])  || 0;
     const upperPitch = parseFloat(row["imu_upper_pitch_deg"]) || 0;
-    const lowerPitch = parseFloat(row["imu_lower_pitch_deg"]) || 0;
+    // const lowerRoll  = parseFloat(row["imu_lower_roll_deg"])  || 0;
+    // const upperPitch = parseFloat(row["imu_upper_pitch_deg"]) || 0;
+    // const lowerPitch = parseFloat(row["imu_lower_pitch_deg"]) || 0;
 
-    // --- Chart 1: roll only ---
-    if (!chartInstance) {
-        // First packet ever — build the chart with one point
-        tablechart([row]);
-    } else {
-        chartInstance.data.labels.push(label);
-        chartInstance.data.datasets[0].data.push(upperRoll);
-        chartInstance.data.datasets[1].data.push(lowerRoll);
-        chartInstance.update('none');   // 'none' skips animation for performance
-    }
+    // // --- Chart 1: roll only ---
+    // if (!chartInstance) {
+    //     // First packet ever — build the chart with one point
+    //     tablechart([row]);
+    // } else {
+    //     chartInstance.data.labels.push(label);
+    //     chartInstance.data.datasets[0].data.push(upperRoll);
+    //     chartInstance.data.datasets[1].data.push(lowerRoll);
+    //     chartInstance.update('none');   // 'none' skips animation for performance
+    // }
 
-    // --- Chart 2: all 4 channels ---
+    // --- Chart ---
     if (!chartInstance1) {
         tablechart2([row]);
     } else {
         chartInstance1.data.labels.push(label);
-        chartInstance1.data.datasets[0].data.push(upperRoll);
-        chartInstance1.data.datasets[1].data.push(lowerRoll);
-        chartInstance1.data.datasets[2].data.push(upperPitch);
-        chartInstance1.data.datasets[3].data.push(lowerPitch);
+        chartInstance1.data.datasets[0].data.push(upperPitch);
+        // chartInstance1.data.datasets[1].data.push(lowerRoll);
+        // chartInstance1.data.datasets[2].data.push(upperPitch);
+        // chartInstance1.data.datasets[3].data.push(lowerPitch);
         chartInstance1.update('none');
     }
 }
 
-// ===== TABLE REFRESH (no chart rebuild) =====
-// Rebuilds only the HTML table; leaves charts untouched.
+// ===== TABLE REFRESH =====
 
 function refreshTable(data) {
     const output = document.getElementById("output");
@@ -410,7 +416,9 @@ function refreshTable(data) {
     }
     const headers = Object.keys(data[0]);
     let table = "<table><tr>";
-    headers.forEach(h => table += `<th>${h}</th>`);
+    //headers.forEach(h => table += `<th>${h}</th>`);
+    const headerLabels = { imu_upper_pitch_deg: "degrees", timestamp: "timestamp (Seconds)", status: "status" };
+    headers.forEach(h => table += `<th>${headerLabels[h] || h}</th>`);
     table += "</tr>";
     data.forEach(row => {
         table += "<tr>";
@@ -420,8 +428,14 @@ function refreshTable(data) {
     table += "</table>";
     output.innerHTML = table;
 }
-
-// ===== DISPLAY DATA (full rebuild — CSV uploads / server fetch) =====
+function saveGraph() {
+    const canvas = document.getElementById("postureChart2");
+    const link = document.createElement("a");
+    link.download = "posture_graph.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+}
+// ===== DISPLAY DATA=====
 
 function displayData(data) {
     const output = document.getElementById("output");
@@ -432,7 +446,7 @@ function displayData(data) {
     }
 
     refreshTable(data);
-    tablechart(data);
+    // tablechart(data);
     tablechart2(data);
 }
 

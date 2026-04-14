@@ -13,3 +13,49 @@ a:hover {
 a:visited {
     color: #c8e8c8;
 }
+#postureChart2 {
+    background-color: #000000;
+    border-radius: 8px;   /* optional, looks nicer */
+}
+button {
+    background-color: #1a5c2a;
+    color: #fbf6c8;
+    border: 1px solid #fbf6c8;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+button:hover {
+    background-color: #2a7a3a;
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.upload-label {
+    background-color: #1a5c2a;
+    color: #fbf6c8;
+    border: 1px solid #fbf6c8;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.upload-label:hover {
+    background-color: #2a7a3a;
+}
+
+input[type="file"] {
+    color: #fbf6c8;
+}
+* {
+    font-family: inherit;
+}
+
+body {
+    font-family: Georgia, serif;  /* or whatever font you want */
+}
