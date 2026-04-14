@@ -293,7 +293,7 @@ function parseCSV(text) {
 
 // ===== CHART STATE =====
 
-let chartInstance  = null;   // postureChart  (upper/lower roll)
+let chartInstance  = null;   // postureChart  (upper/lower roll) - old chart but for some reason I cant get rid of this line without having to change a bunch of stuff
 let chartInstance1 = null;   // postureChart2 (all 4 channels)
 
 // =====  CHART BUILD (used for CSV uploads / initial load) =====
@@ -338,7 +338,7 @@ function tablechart2(data) {
     const lowerRoll  = data.map(row => parseFloat(row["imu_lower_roll_deg"])  || 0);
     const upperPitch = data.map(row => parseFloat(row["degrees"]) || 0);
     const lowerPitch = data.map(row => parseFloat(row["imu_lower_pitch_deg"]) || 0);
-
+// a lot of this is from the old design and is unused. should i delete it - probably! do i want to touch my working code right now? NO
     if (chartInstance1) chartInstance1.destroy();
 
     chartInstance1 = new Chart(canvas, {
@@ -369,29 +369,13 @@ function tablechart2(data) {
     });
 }
 
-// ===== INCREMENTAL CHART UPDATE (used for every live BLE packet) =====
-// Instead of destroying and rebuilding the chart on every packet (which caused
-// the graphs to never visibly accumulate data), we push one new point onto
-// the existing Chart.js datasets and call update('none') to skip animation.
+// ===== INCREMENTAL CHART UPDATE  =====
 
 function appendToCharts(row) {
     const label      = row["timestamp"] ? (Number(row["timestamp"]) / 1000).toFixed(4) : "";
     //const upperRoll  = parseFloat(row["Degrees"])  || 0;
     const upperPitch = parseFloat(row["imu_upper_pitch_deg"]) || 0;
-    // const lowerRoll  = parseFloat(row["imu_lower_roll_deg"])  || 0;
-    // const upperPitch = parseFloat(row["imu_upper_pitch_deg"]) || 0;
-    // const lowerPitch = parseFloat(row["imu_lower_pitch_deg"]) || 0;
-
-    // // --- Chart 1: roll only ---
-    // if (!chartInstance) {
-    //     // First packet ever — build the chart with one point
-    //     tablechart([row]);
-    // } else {
-    //     chartInstance.data.labels.push(label);
-    //     chartInstance.data.datasets[0].data.push(upperRoll);
-    //     chartInstance.data.datasets[1].data.push(lowerRoll);
-    //     chartInstance.update('none');   // 'none' skips animation for performance
-    // }
+   
 
     // --- Chart ---
     if (!chartInstance1) {
@@ -456,6 +440,9 @@ function destroyChart() {
     document.getElementById('postureChart').style.display  = 'none';
     document.getElementById('postureChart2').style.display = 'none';
 }
+
+
+// old code that doesnt work - has some weird bugs in it - version like 3 
 // const hardcodedCSV =
 //     'timestamp,imu_upper_roll_deg,imu_upper_pitch_deg,imu_upper_yaw_deg,imu_lower_roll_deg,imu_lower_pitch_deg,imu_lower_yaw_deg';
 
