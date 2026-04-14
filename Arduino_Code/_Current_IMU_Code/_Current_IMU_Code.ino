@@ -20,6 +20,7 @@
 #define IMU1_ADDR 0x68
 #define IMU2_ADDR 0x69
 
+
 // ── MPU6050 Registers ───────────────────────────────────────────
 #define PWR_MGMT_1   0x6B
 #define ACCEL_CONFIG 0x1C
@@ -51,6 +52,8 @@ bool deviceConnected   = false;
 bool oldDeviceConnected = false;
 bool requestCalibration = true;
 
+float beta = 0.1f;
+
 // ================================================================
 // Madgwick Filter (fixed dt = 1/sampleFreq)
 // ================================================================
@@ -67,8 +70,7 @@ struct MadgwickFilter {
   }
 
   // gx/gy/gz in deg/s, ax/ay/az in g
-  void updateIMU(float gx, float gy, float gz,
-                 float ax, float ay, float az) {
+  void updateIMU(float gx, float gy, float gz, float ax, float ay, float az) {
 
     // Convert gyro to rad/s
     gx *= (PI / 180.0f);
@@ -137,7 +139,7 @@ struct MadgwickFilter {
   }
 
   float getPitch() const {
-    return asinf(2.0f * (q0 * q2 - q3 * q1)) * (180.0f / PI);
+    return asinf(constrain(2.0f * (q0 * q2 - q3 * q1), -1.0f, 1.0f)) * (180.0f / PI);
   }
 
   float getRoll() const {
@@ -187,9 +189,7 @@ void initMPU(uint8_t addr) {
   delay(100);
 }
 
-void readRawIMU(uint8_t addr,
-                float &ax, float &ay, float &az,
-                float &gx, float &gy, float &gz) {
+void readRawIMU(uint8_t addr, float &ax, float &ay, float &az, float &gx, float &gy, float &gz) {
   // Read accelerometer
   Wire.beginTransmission(addr);
   Wire.write(ACCEL_XOUT_H);
@@ -248,9 +248,12 @@ void updateGyroBias(CalibData &cal, float gx, float gy, float gz, float alpha = 
 // ================================================================
 
 float angleBetweenOrientations(MadgwickFilter &f1, MadgwickFilter &f2) {
-  float dot = f1.q0 * f2.q0 + f1.q1 * f2.q1 + f1.q2 * f2.q2 + f1.q3 * f2.q3;
-  dot = constrain(dot, -1.0f, 1.0f);
-  return 2.0f * acosf(fabsf(dot)) * (180.0f / PI);
+  float rw =  f1.q0*f2.q0 + f1.q1*f2.q1 + f1.q2*f2.q2 + f1.q3*f2.q3;
+  float rx = -f1.q0*f2.q1 + f1.q1*f2.q0 + f1.q2*f2.q3 - f1.q3*f2.q2;
+  float ry = -f1.q0*f2.q2 - f1.q1*f2.q3 + f1.q2*f2.q0 + f1.q3*f2.q1;
+  float rz = -f1.q0*f2.q3 + f1.q1*f2.q2 - f1.q2*f2.q1 + f1.q3*f2.q0;
+  float pitch = asinf(constrain(2.0f * (rw*ry - rz*rx), -1.0f, 1.0f));
+  return pitch * (180.0f / PI);
 }
 
 // ================================================================
@@ -327,14 +330,15 @@ void setup() {
   initMPU(IMU1_ADDR);
   initMPU(IMU2_ADDR);
 
-  filter1.begin(SAMPLE_RATE_HZ, 0.1f);
-  filter2.begin(SAMPLE_RATE_HZ, 0.1f);
+  filter1.begin(SAMPLE_RATE_HZ, beta);
+  filter2.begin(SAMPLE_RATE_HZ, beta);
 
   Serial.println("Stand still and straight for 2 seconds...");
   delay(2000);
   calibrateIMU(IMU1_ADDR, cal1);
   calibrateIMU(IMU2_ADDR, cal2);
   Serial.println("Calibration done. Warming up...");
+
 }
 
 // ================================================================
@@ -362,8 +366,8 @@ void loop() {
     calibrateIMU(IMU1_ADDR, cal1);
     calibrateIMU(IMU2_ADDR, cal2);
 
-    filter1.begin(SAMPLE_RATE_HZ, 0.1f);
-    filter2.begin(SAMPLE_RATE_HZ, 0.1f);
+    filter1.begin(SAMPLE_RATE_HZ, beta);
+    filter2.begin(SAMPLE_RATE_HZ, beta);
 
     Serial.println("Calibration done. Warming up...");
     return;
@@ -372,17 +376,18 @@ void loop() {
   readRawIMU(IMU1_ADDR, ax1, ay1, az1, gx1, gy1, gz1);
   readRawIMU(IMU2_ADDR, ax2, ay2, az2, gx2, gy2, gz2);
 
-  // updates bias slightly only if both IMUs are still
-  if (imuIsStill(ax1, ay1, az1, gx1, gy1, gz1) && imuIsStill(ax2, ay2, az2, gx2, gy2, gz2)) {
-    updateGyroBias(cal1, gx1, gy1, gz1);
-    updateGyroBias(cal2, gx2, gy2, gz2);
-  }
 
   // Apply calibration offsets
   ax1 -= cal1.ax; ay1 -= cal1.ay; az1 -= cal1.az;
   gx1 -= cal1.gx; gy1 -= cal1.gy; gz1 -= cal1.gz;
   ax2 -= cal2.ax; ay2 -= cal2.ay; az2 -= cal2.az;
   gx2 -= cal2.gx; gy2 -= cal2.gy; gz2 -= cal2.gz;
+
+    // updates bias slightly only if both IMUs are still
+  if (imuIsStill(ax1, ay1, az1, gx1, gy1, gz1) && imuIsStill(ax2, ay2, az2, gx2, gy2, gz2)) {
+    updateGyroBias(cal1, gx1, gy1, gz1);
+    updateGyroBias(cal2, gx2, gy2, gz2);
+  }
 
   // Madgwick updates with fixed dt = 1 / SAMPLE_RATE_HZ
   filter1.updateIMU(gx1, gy1, gz1, ax1, ay1, az1);
@@ -398,14 +403,16 @@ void loop() {
     return;
   }
 
-  float pitch1 = filter1.getPitch();
-  float pitch2 = filter2.getPitch();
-  float backAngle = fabsf(pitch2 - pitch1);  // 1D, gravity-based angle
+  //float pitch1 = filter1.getPitch();
+  //float pitch2 = filter2.getPitch();
+  //float backAngle = fabsf(pitch2 - pitch1);  // 1D, gravity-based angle
+  float backAngle = angleBetweenOrientations(filter1, filter2);
 
   const char* posture;
-  if (backAngle < 10)      posture = "GOOD - Straight";
-  else if (backAngle < 20) posture = "MILD - Slight bend";
-  else if (backAngle < 35) posture = "POOR - Slouching";
+  float absBackAngle = fabsf(backAngle);
+  if (absBackAngle < 10)      posture = "GOOD - Straight";
+  else if (absBackAngle < 20) posture = "MILD - Slight bend";
+  else if (absBackAngle < 35) posture = "POOR - Slouching";
   else                     posture = "BAD - Severe bend";
 
   // Serial debug (every loop ~ 10ms)
@@ -439,4 +446,5 @@ void loop() {
   if (deviceConnected && !oldDeviceConnected) {
     oldDeviceConnected = deviceConnected;
   }
+
 }
