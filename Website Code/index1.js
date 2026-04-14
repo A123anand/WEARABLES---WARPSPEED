@@ -442,7 +442,7 @@ function destroyChart() {
 }
 
 
-// old code that doesnt work - has some weird bugs in it - version like 3 
+// old code that doesnt work - has some weird bugs in it - version like 3 F
 // const hardcodedCSV =
 //     'timestamp,imu_upper_roll_deg,imu_upper_pitch_deg,imu_upper_yaw_deg,imu_lower_roll_deg,imu_lower_pitch_deg,imu_lower_yaw_deg';
 
