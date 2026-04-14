@@ -161,7 +161,18 @@ function updateLiveMetrics(packet) {
         return;
     }
     if (angleEl)  angleEl.textContent  = (packet.angle !== undefined ? packet.angle.toFixed(1) + '°' : '--°');
+    // if (statusEl) statusEl.textContent = packet.status || '--';
     if (statusEl) statusEl.textContent = packet.status || '--';
+
+    const indicator = document.getElementById('postureStatus');
+    if (indicator && packet.status) {
+        indicator.textContent = packet.status;
+        indicator.style.display = 'inline-block';
+        if (packet.status.includes('GOOD'))      indicator.style.backgroundColor = '#2a7a3a';
+        else if (packet.status.includes('MILD')) indicator.style.backgroundColor = '#b8860b';
+        else if (packet.status.includes('POOR')) indicator.style.backgroundColor = '#cc5500';
+        else                                     indicator.style.backgroundColor = '#8b0000';
+    }
     if (countEl)  countEl.textContent  = liveRows.length;
 }
 
